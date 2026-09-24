@@ -43,4 +43,35 @@
   document.querySelectorAll('[data-year]').forEach((node) => {
     node.textContent = new Date().getFullYear();
   });
+
+  const calculator = document.querySelector('[data-cost-calculator]');
+  if (calculator) {
+    const fields = {
+      watts: calculator.querySelector('[data-watts]'),
+      rate: calculator.querySelector('[data-rate]'),
+      hours: calculator.querySelector('[data-hours]'),
+      days: calculator.querySelector('[data-days]')
+    };
+    const outputs = {
+      hour: calculator.querySelector('[data-hour-cost]'),
+      day: calculator.querySelector('[data-day-cost]'),
+      month: calculator.querySelector('[data-month-cost]'),
+      energy: calculator.querySelector('[data-energy]')
+    };
+    const money = (pence) => pence < 100 ? `${pence.toFixed(1)}p` : `£${(pence / 100).toFixed(2)}`;
+    const calculate = () => {
+      const watts = Math.max(0, Number(fields.watts.value) || 0);
+      const rate = Math.max(0, Number(fields.rate.value) || 0);
+      const hours = Math.min(24, Math.max(0, Number(fields.hours.value) || 0));
+      const days = Math.min(31, Math.max(0, Number(fields.days.value) || 0));
+      const hourlyPence = (watts / 1000) * rate;
+      const dailyPence = hourlyPence * hours;
+      outputs.hour.textContent = money(hourlyPence);
+      outputs.day.textContent = money(dailyPence);
+      outputs.month.textContent = money(dailyPence * days);
+      outputs.energy.textContent = `${((watts / 1000) * hours).toFixed(2)} kWh`;
+    };
+    Object.values(fields).forEach((field) => field.addEventListener('input', calculate));
+    calculate();
+  }
 })();
